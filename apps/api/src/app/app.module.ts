@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@org/auth';
+import { CreditChecksModule } from '@org/credit-checks';
 import { DatabaseModule } from '@org/database';
 import { LoansModule } from '@org/loans';
 import { LoanPurposesModule } from '@org/loan-purposes';
@@ -10,6 +11,7 @@ import { AppService } from './app.service';
   imports: [
     DatabaseModule,
     AuthModule,
+    CreditChecksModule,
     LoanPurposesModule,
     LoansModule,
   ],

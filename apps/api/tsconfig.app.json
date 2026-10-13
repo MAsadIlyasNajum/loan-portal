@@ -26,6 +26,9 @@
       "path": "../../libs/api/auth/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/api/credit-checks/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/api/loan-purposes/tsconfig.lib.json"
     },
     {

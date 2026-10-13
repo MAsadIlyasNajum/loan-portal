@@ -47,6 +47,15 @@ module.exports = async function () {
       cwd: join(workspaceRoot, 'libs', 'api', 'auth'),
       env: {
         ...process.env,
+        // The jest/ts-node toolchain injects these
+        // into the test workers; the seed script is
+        // a standalone process and must not inherit
+        // them — they would override the script's
+        // own tsconfig (TS_NODE_COMPILER_OPTIONS
+        // forces a deprecated moduleResolution that
+        // newer TypeScript versions reject).
+        TS_NODE_COMPILER_OPTIONS: undefined,
+        TS_JEST: undefined,
         TS_NODE_PROJECT: 'tsconfig.script.json',
         ADMIN_BOOTSTRAP_EMAIL: E2E_ADMIN_EMAIL,
         ADMIN_BOOTSTRAP_PASSWORD: E2E_ADMIN_PASSWORD,

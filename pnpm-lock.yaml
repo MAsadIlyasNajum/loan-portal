@@ -252,6 +252,9 @@ importers:
       '@org/auth':
         specifier: workspace:*
         version: link:../../libs/api/auth
+      '@org/credit-checks':
+        specifier: workspace:*
+        version: link:../../libs/api/credit-checks
       '@org/database':
         specifier: workspace:*
         version: link:../../libs/api/database
@@ -287,6 +290,12 @@ importers:
         specifier: workspace:*
         version: link:../database
 
+  libs/api/credit-checks:
+    dependencies:
+      '@org/database':
+        specifier: workspace:*
+        version: link:../database
+
   libs/api/database: {}
 
   libs/api/loan-purposes:
@@ -303,6 +312,9 @@ importers:
       '@org/auth':
         specifier: workspace:*
         version: link:../auth
+      '@org/credit-checks':
+        specifier: workspace:*
+        version: link:../credit-checks
       '@org/database':
         specifier: workspace:*
         version: link:../database

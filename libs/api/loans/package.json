@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@org/auth": "workspace:*",
+    "@org/credit-checks": "workspace:*",
     "@org/database": "workspace:*",
     "@org/loan-purposes": "workspace:*"
   },
