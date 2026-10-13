@@ -19,22 +19,42 @@ jobs:
           filter: tree:0
           fetch-depth: 0
 
-      # This enables task distribution via Nx Cloud
-      # Run this command as early as possible, before dependencies are installed
-      # Learn more at https://nx.dev/docs/reference/nx-cloud-cli#npx-nxcloud-startcirun
-      - run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
-
-      # Cache node_modules
+      # Set up Node.js
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: 'npm'
 
-      - run: npm ci
+      # Enable and set up pnpm package manager
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: false
 
-      # Prepend any command with "nx record --" to record its logs to Nx Cloud
-      - run: npx nx record -- npx nx format:check --base="remotes/origin/main"
-      - run: npx nx run-many -t lint test build typecheck e2e
-      # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/docs/features/ci-features/self-healing-ci
-      - run: npx nx fix-ci
+      # Get pnpm store directory for fast caching
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      # Cache pnpm modules
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # Start Nx Cloud CI run (using pnpm dlx or pnpm exec)
+      - run: pnpm dlx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
+
+      # Install dependencies with pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Run tasks using pnpm nx
+      - run: pnpm nx record -- pnpm nx format:check --base="remotes/origin/main"
+      - run: pnpm nx run-many -t lint test build typecheck e2e
+      
+      # Nx Cloud self-healing CI
+      - run: pnpm nx fix-ci
         if: always()
