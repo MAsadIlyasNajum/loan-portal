@@ -2,6 +2,46 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": [],
+  "references": [
+    {
+      "path": "./apps/api-e2e"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./libs/api/credit-checks"
+    },
+    {
+      "path": "./libs/api/loan-purposes"
+    },
+    {
+      "path": "./libs/api/customers"
+    },
+    {
+      "path": "./libs/api/database"
+    },
+    {
+      "path": "./libs/api/common"
+    },
+    {
+      "path": "./libs/api/loans"
+    },
+    {
+      "path": "./libs/api/auth"
+    },
+    {
+      "path": "./libs/contracts/shared"
+    },
+    {
+      "path": "./libs/web/ui"
+    }
+  ],
   "compilerOptions": {}
 }

@@ -18,6 +18,17 @@
     "target": "es2022",
     "customConditions": ["@org/source"],
     "noUncheckedSideEffectImports": false,
-    "types": ["*"]
+    "types": ["*"],
+    "paths": {
+      "@org/loans": ["./libs/api/loans/src/index.ts"],
+      "@org/customers": ["./libs/api/customers/src/index.ts"],
+      "@org/auth": ["./libs/api/auth/src/index.ts"],
+      "@org/credit-checks": ["./libs/api/credit-checks/src/index.ts"],
+      "@org/loan-purposes": ["./libs/api/loan-purposes/src/index.ts"],
+      "@org/database": ["./libs/api/database/src/index.ts"],
+      "@org/common": ["./libs/api/common/src/index.ts"],
+      "@org/ui": ["./libs/web/ui/src/index.ts"],
+      "@org/contracts": ["./libs/contracts/shared/src/index.ts"]
+    }
   }
 }

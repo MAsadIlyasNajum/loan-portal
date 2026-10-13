@@ -1,0 +1,5 @@
+packages:
+  - 'apps/*'
+  - 'apps/*-e2e'
+  - 'libs/*'
+  - 'libs/*/*'

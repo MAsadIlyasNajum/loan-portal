@@ -1,0 +1,18 @@
+{
+  "name": "auth",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/api/auth/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/auth",
+        "command": "jest --config=jest.config.cts --passWithNoTests"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^production", "sharedGlobals", { "externalDependencies": ["jest", "ts-jest"] }]
+    }
+  }
+}

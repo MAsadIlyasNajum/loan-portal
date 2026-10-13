@@ -1,0 +1,18 @@
+{
+  "name": "loan-purposes",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/api/loan-purposes/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/loan-purposes",
+        "command": "jest --config=jest.config.cts --passWithNoTests"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^production", "sharedGlobals", { "externalDependencies": ["jest", "ts-jest"] }]
+    }
+  }
+}
