@@ -5,5 +5,8 @@ module.exports = {
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(.pnpm/)?@nestjs|.pnpm/@prisma/)',
+  ],
   moduleFileExtensions: ['ts', 'js', 'html'],
 };
