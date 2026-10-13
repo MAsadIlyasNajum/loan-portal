@@ -19,28 +19,42 @@ jobs:
           filter: tree:0
           fetch-depth: 0
 
-      # 1. Install pnpm first so it is available for Nx and dependency installation
+      # Set up Node.js
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      # Enable and set up pnpm package manager
       - uses: pnpm/action-setup@v4
         with:
           version: latest
           run_install: false
 
-      # 2. Setup Node.js with pnpm caching
-      - uses: actions/setup-node@v5
+      # Get pnpm store directory for fast caching
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      # Cache pnpm modules
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
         with:
-          node-version: 24
-          cache: 'pnpm'
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
-      # 3. Enable task distribution via Nx Cloud (run before dependencies are installed)
-      - run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
+      # Start Nx Cloud CI run (using pnpm dlx or pnpm exec)
+      - run: pnpm dlx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
 
-      # 4. Install dependencies using pnpm
+      # Install dependencies with pnpm
       - run: pnpm install --frozen-lockfile
 
-      # 5. Run your Nx tasks
-      - run: npx nx record -- npx nx format:check --base="remotes/origin/main"
-      - run: npx nx run-many -t lint test build typecheck e2e
+      # Run tasks using pnpm nx
+      - run: pnpm nx record -- pnpm nx format:check --base="remotes/origin/main"
+      - run: pnpm nx run-many -t lint test build typecheck e2e
       
-      # 6. Self-healing CI fixes
-      - run: npx nx fix-ci
+      # Nx Cloud self-healing CI
+      - run: pnpm nx fix-ci
         if: always()
