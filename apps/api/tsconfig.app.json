@@ -24,6 +24,12 @@
     },
     {
       "path": "../../libs/api/auth/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/api/loan-purposes/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/api/loans/tsconfig.lib.json"
     }
   ]
 }

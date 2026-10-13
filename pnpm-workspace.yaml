@@ -3,3 +3,7 @@ packages:
   - 'apps/*-e2e'
   - 'libs/*'
   - 'libs/*/*'
+
+minimumReleaseAgeExclude:
+  - electron-to-chromium
+  - postcss

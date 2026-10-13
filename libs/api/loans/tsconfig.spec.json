@@ -2,13 +2,17 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "dist/out-tsc",
+    "rootDir": "src",
     "module": "commonjs",
     "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "types": ["jest", "node"]
   },
+  "references": [
+    { "path": "./tsconfig.lib.json" }
+  ],
   "include": [
-    "jest.config.ts",
-    "jest.config.cts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
     "src/**/*.d.ts"
