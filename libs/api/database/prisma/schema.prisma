@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @db.VarChar(255)
+  role         UserRole @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  applications LoanApplication[]
+
+  @@map("users")
+}
+
+model LoanPurpose {
+  id          String   @id @default(uuid())
+  code        String   @unique @db.VarChar(50)
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications LoanApplication[]
+
+  @@map("loan_purposes")
+}
+
+model LoanApplication {
+  id              String            @id @default(uuid())
+  fullName        String            @db.VarChar(255)
+  nric            String            @unique @db.VarChar(20)
+  phone           String            @db.VarChar(20)
+  email           String            @db.VarChar(255)
+  monthlyIncome   Decimal           @db.Decimal(15, 2)
+  requestedAmount Decimal           @db.Decimal(15, 2)
+  tenureMonths    Int
+  purposeId       String
+  userId          String
+  status          ApplicationStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose  LoanPurpose @relation(fields: [purposeId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([purposeId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("loan_applications")
+}

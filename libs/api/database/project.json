@@ -13,6 +13,50 @@
       },
       "dependsOn": ["^build"],
       "inputs": ["default", "^production", "sharedGlobals", { "externalDependencies": ["jest", "ts-jest"] }]
+    },
+    "prisma:generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma generate --schema=prisma/schema.prisma"
+      },
+      "outputs": ["{projectRoot}/node_modules/.prisma/client"]
+    },
+    "prisma:migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma migrate dev --schema=prisma/schema.prisma"
+      }
+    },
+    "prisma:migrate:deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma migrate deploy --schema=prisma/schema.prisma"
+      }
+    },
+    "prisma:studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma studio --schema=prisma/schema.prisma"
+      }
+    },
+    "prisma:db:push": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma db push --schema=prisma/schema.prisma"
+      }
+    },
+    "db:setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/database",
+        "command": "prisma generate --schema=prisma/schema.prisma && prisma migrate dev --schema=prisma/schema.prisma --name init"
+      },
+      "dependsOn": []
     }
   }
 }
