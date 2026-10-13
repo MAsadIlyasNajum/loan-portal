@@ -13,6 +13,17 @@
       },
       "dependsOn": ["^build"],
       "inputs": ["default", "^production", "sharedGlobals", { "externalDependencies": ["jest", "ts-jest"] }]
+    },
+    "seed:admin": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/api/auth",
+        "command": "node -r ts-node/register/transpile-only prisma/seed-admin.ts",
+        "env": {
+          "TS_NODE_PROJECT": "tsconfig.script.json"
+        }
+      },
+      "dependsOn": ["^build"]
     }
   }
 }

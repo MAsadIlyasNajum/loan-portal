@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist/out-tsc-script",
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["prisma/**/*.ts", "src/**/*.ts"]
+}

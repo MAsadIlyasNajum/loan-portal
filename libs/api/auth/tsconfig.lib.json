@@ -4,6 +4,7 @@
     "outDir": "dist/out-tsc",
     "rootDir": "src",
     "declaration": true,
+    "emitDeclarationOnly": false,
     "types": ["node"],
     "target": "es2021",
     "experimentalDecorators": true,
@@ -20,5 +21,10 @@
     "jest.config.cts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../database/tsconfig.lib.json"
+    }
   ]
 }

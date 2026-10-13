@@ -26,35 +26,35 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/api/database",
-        "command": "prisma migrate dev --schema=prisma/schema.prisma"
+        "command": "prisma migrate dev --config prisma/config.ts --schema=prisma/schema.prisma"
       }
     },
     "prisma:migrate:deploy": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/api/database",
-        "command": "prisma migrate deploy --schema=prisma/schema.prisma"
+        "command": "prisma migrate deploy --config prisma/config.ts --schema=prisma/schema.prisma"
       }
     },
     "prisma:studio": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/api/database",
-        "command": "prisma studio --schema=prisma/schema.prisma"
+        "command": "prisma studio --config prisma/config.ts --schema=prisma/schema.prisma"
       }
     },
     "prisma:db:push": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/api/database",
-        "command": "prisma db push --schema=prisma/schema.prisma"
+        "command": "prisma db push --config prisma/config.ts --schema=prisma/schema.prisma"
       }
     },
     "db:setup": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/api/database",
-        "command": "prisma generate --schema=prisma/schema.prisma && prisma migrate dev --schema=prisma/schema.prisma --name init"
+        "command": "prisma generate --schema=prisma/schema.prisma && prisma migrate dev --config prisma/config.ts --schema=prisma/schema.prisma --name init"
       },
       "dependsOn": []
     }
