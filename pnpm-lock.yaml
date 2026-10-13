@@ -255,6 +255,12 @@ importers:
       '@org/database':
         specifier: workspace:*
         version: link:../../libs/api/database
+      '@org/loan-purposes':
+        specifier: workspace:*
+        version: link:../../libs/api/loan-purposes
+      '@org/loans':
+        specifier: workspace:*
+        version: link:../../libs/api/loans
       reflect-metadata:
         specifier: ^0.2.0
         version: 0.2.2
@@ -282,6 +288,27 @@ importers:
         version: link:../database
 
   libs/api/database: {}
+
+  libs/api/loan-purposes:
+    dependencies:
+      '@org/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@org/database':
+        specifier: workspace:*
+        version: link:../database
+
+  libs/api/loans:
+    dependencies:
+      '@org/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@org/database':
+        specifier: workspace:*
+        version: link:../database
+      '@org/loan-purposes':
+        specifier: workspace:*
+        version: link:../loan-purposes
 
 packages:
 
