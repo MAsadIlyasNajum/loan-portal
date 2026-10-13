@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ApplicationStatus, Prisma } from '@prisma/client';
 import { AuthenticatedUser, UserRole } from '@org/auth';
+import type { CreditChecksService } from '@org/credit-checks';
 import type { LoanPurposesService } from '@org/loan-purposes';
 import type { PrismaService } from '@org/database';
 import { LoansService } from './loans.service';
@@ -95,18 +96,34 @@ describe('LoansService', () => {
       findMany: jest.fn(),
       findUnique: jest.fn(),
     },
+    // The application and its credit check job are
+    // created in a single transaction; the test
+    // double runs the transaction callback against
+    // the same mocked delegates.
+    $transaction: jest.fn(
+      async (callback: (tx: unknown) => Promise<unknown>) =>
+        callback({ loanApplication: prisma.loanApplication }),
+    ),
   };
   const loanPurposes = {
     findPurposeById: jest.fn(),
+  };
+  const creditChecks = {
+    scheduleCreditCheck: jest.fn(),
   };
   let service: LoansService;
 
   beforeEach(() => {
     jest.clearAllMocks();
     loanPurposes.findPurposeById.mockResolvedValue(ACTIVE_PURPOSE);
+    creditChecks.scheduleCreditCheck.mockResolvedValue({
+      id: 'job-1',
+      status: 'QUEUED',
+    });
     service = new LoansService(
       prisma as unknown as PrismaService,
       loanPurposes as unknown as LoanPurposesService,
+      creditChecks as unknown as CreditChecksService,
     );
   });
 
@@ -139,6 +156,20 @@ describe('LoansService', () => {
       expect(result.status).toBe(ApplicationStatus.PENDING);
       expect(result.monthlyIncome).toBe(5000);
       expect(result.requestedAmount).toBe(20000);
+    });
+
+    it('schedules a durable credit check for the new application in the same transaction', async () => {
+      prisma.loanApplication.create.mockImplementation(
+        async ({ data }: { data: Record<string, unknown> }) =>
+          createApplication({ ...data, id: 'application-1' }),
+      );
+
+      await service.createApplication(CUSTOMER, createDto());
+
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+      expect(
+        creditChecks.scheduleCreditCheck,
+      ).toHaveBeenCalledWith('application-1', expect.anything());
     });
 
     it('normalizes the NRIC, phone and email before persistence', async () => {

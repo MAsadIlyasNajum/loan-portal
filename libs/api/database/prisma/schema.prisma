@@ -18,6 +18,13 @@ enum ApplicationStatus {
   CANCELLED
 }
 
+enum CreditCheckJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique @db.VarChar(255)
@@ -62,10 +69,38 @@ model LoanApplication {
 
   user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   purpose  LoanPurpose @relation(fields: [purposeId], references: [id], onDelete: Restrict)
+  creditCheckJob CreditCheckJob?
 
   @@index([userId])
   @@index([purposeId])
   @@index([status])
   @@index([createdAt])
   @@map("loan_applications")
+}
+
+/// Durable, database-backed job queue for asynchronous
+/// credit checks. One row per loan application (unique on
+/// applicationId), so a credit check can never be
+/// scheduled twice for the same application.
+model CreditCheckJob {
+  id            String               @id @default(uuid())
+  applicationId String               @unique
+  status        CreditCheckJobStatus @default(QUEUED)
+  /// When the simulated credit check becomes due
+  /// (created at + the randomly selected delay).
+  scheduledFor  DateTime
+  attempts      Int                  @default(0)
+  maxAttempts   Int                  @default(5)
+  outcome       ApplicationStatus?
+  lastError     String?              @db.Text
+  lockedAt      DateTime?
+  lockedBy      String?
+  completedAt   DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  application LoanApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledFor])
+  @@map("credit_check_jobs")
 }

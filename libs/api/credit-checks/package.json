@@ -1,0 +1,16 @@
+{
+  "name": "@org/credit-checks",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@org/database": "workspace:*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@org/source": "./src/index.ts",
+      "types": "./dist/out-tsc/index.d.ts",
+      "default": "./dist/out-tsc/index.js"
+    }
+  }
+}

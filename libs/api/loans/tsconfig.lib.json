@@ -30,6 +30,9 @@
       "path": "../database/tsconfig.lib.json"
     },
     {
+      "path": "../credit-checks/tsconfig.lib.json"
+    },
+    {
       "path": "../auth/tsconfig.lib.json"
     }
   ]

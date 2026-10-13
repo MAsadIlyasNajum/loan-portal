@@ -14,6 +14,7 @@ import {
   normalizeEmail,
   UserRole,
 } from '@org/auth';
+import { CreditChecksService } from '@org/credit-checks';
 import { PrismaService } from '@org/database';
 import { LoanPurposesService } from '@org/loan-purposes';
 import { LoanApplicationDto } from '../domain/loan-application.dto';
@@ -38,6 +39,7 @@ export class LoansService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly loanPurposes: LoanPurposesService,
+    private readonly creditChecks: CreditChecksService,
   ) {}
 
   /**
@@ -66,23 +68,37 @@ export class LoansService {
     }
 
     try {
-      const application = await this.prisma.loanApplication.create({
-        data: {
-          fullName: dto.fullName.trim(),
-          nric: normalizeNric(dto.nric),
-          phone: normalizePhone(dto.phone),
-          email: normalizeEmail(dto.email),
-          monthlyIncome: dto.monthlyIncome,
-          requestedAmount: dto.loanAmount,
-          tenureMonths: dto.tenureMonths,
-          purposeId: purpose.id,
-          // The applicant comes from the authenticated
-          // principal; a request body can never assign an
-          // application to another user.
-          userId: user.id,
-          status: ApplicationStatus.PENDING,
+      // The application and its credit check job are
+      // created in a single transaction: the queued
+      // check is durable from the very first moment
+      // and survives process restarts.
+      const application = await this.prisma.$transaction(
+        async (transaction) => {
+          const created =
+            await transaction.loanApplication.create({
+              data: {
+                fullName: dto.fullName.trim(),
+                nric: normalizeNric(dto.nric),
+                phone: normalizePhone(dto.phone),
+                email: normalizeEmail(dto.email),
+                monthlyIncome: dto.monthlyIncome,
+                requestedAmount: dto.loanAmount,
+                tenureMonths: dto.tenureMonths,
+                purposeId: purpose.id,
+                // The applicant comes from the authenticated
+                // principal; a request body can never assign an
+                // application to another user.
+                userId: user.id,
+                status: ApplicationStatus.PENDING,
+              },
+            });
+          await this.creditChecks.scheduleCreditCheck(
+            created.id,
+            transaction,
+          );
+          return created;
         },
-      });
+      );
       return toDto(application);
     } catch (error) {
       if (
