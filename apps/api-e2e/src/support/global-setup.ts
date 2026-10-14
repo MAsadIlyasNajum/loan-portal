@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { PrismaClient } from '@prisma/client';
@@ -7,6 +8,25 @@ import { E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD } from './e2e-config';
 
 /* eslint-disable */
 var __TEARDOWN_MESSAGE__: string;
+
+/**
+ * `spawnSync` passes env values verbatim, so an explicit
+ * `undefined` value is serialized as the literal string
+ * `"undefined"` and breaks ts-node's JSON config parsing.
+ * Drop keys whose value is undefined instead of passing
+ * them through.
+ */
+function cleanEnv(
+  env: NodeJS.ProcessEnv,
+): Record<string, string> {
+  const cleaned: Record<string, string> = {};
+  for (const [key, value] of Object.entries(env)) {
+    if (value !== undefined) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
 
 const DATABASE_URL =
   process.env['DATABASE_URL'] ??
@@ -45,7 +65,7 @@ module.exports = async function () {
     ['-r', 'ts-node/register/transpile-only', 'prisma/seed-admin.ts'],
     {
       cwd: join(workspaceRoot, 'libs', 'api', 'auth'),
-      env: {
+      env: cleanEnv({
         ...process.env,
         // The jest/ts-node toolchain injects these
         // into the test workers; the seed script is
@@ -59,14 +79,21 @@ module.exports = async function () {
         TS_NODE_PROJECT: 'tsconfig.script.json',
         ADMIN_BOOTSTRAP_EMAIL: E2E_ADMIN_EMAIL,
         ADMIN_BOOTSTRAP_PASSWORD: E2E_ADMIN_PASSWORD,
-      },
+      }),
       stdio: 'pipe',
     },
   );
   if (seed.status !== 0) {
+    const details = [
+      `status=${seed.status}`,
+      `signal=${seed.signal ?? 'none'}`,
+      `error=${seed.error ? (seed.error as Error).message : 'none'}`,
+      `stdout=\n${seed.stdout?.toString() ?? ''}`,
+      `stderr=\n${seed.stderr?.toString() ?? ''}`,
+    ].join('\n');
+    writeFileSync('/tmp/e2e-seed-debug.txt', details);
     throw new Error(
-      'Failed to provision the e2e admin account: ' +
-        (seed.stderr?.toString() ?? ''),
+      'Failed to provision the e2e admin account: ' + details,
     );
   }
 

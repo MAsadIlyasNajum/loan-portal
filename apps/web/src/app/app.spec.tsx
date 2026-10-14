@@ -1,26 +1,30 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './auth/auth-context';
 
-import App from './app';
+import { App } from './app';
 
 describe('App', () => {
   it('should render successfully', () => {
     const { baseElement } = render(
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>,
     );
     expect(baseElement).toBeTruthy();
   });
 
-  it('should have a greeting as the title', () => {
-    const { getAllByText } = render(
+  it('should redirect to login page when not authenticated', () => {
+    render(
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>,
     );
-    expect(
-      getAllByText(new RegExp('Welcome @org/web', 'gi')).length > 0,
-    ).toBeTruthy();
+    expect(screen.getByText('Log in')).toBeInTheDocument();
+    expect(screen.getByText('Sign in to your loan portal account.')).toBeInTheDocument();
   });
 });
