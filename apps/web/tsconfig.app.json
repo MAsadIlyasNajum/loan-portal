@@ -5,15 +5,17 @@
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "jsx": "react-jsx",
     "lib": ["dom"],
-    "types": [
-      "node",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts",
-      "vite/client"
-    ],
     "rootDir": "src",
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "vite/client",
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "node"
+    ]
   },
   "exclude": [
     "out-tsc",
@@ -26,6 +28,7 @@
     "src/**/*.test.js",
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx",
+    "src/**/__mocks__/**",
     "jest.config.ts",
     "jest.config.cts",
     "eslint.config.js",

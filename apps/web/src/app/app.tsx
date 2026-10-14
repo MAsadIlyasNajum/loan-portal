@@ -1,52 +1,74 @@
-// Uncomment this line to use CSS modules
-// import styles from './app.module.css';
-import NxWelcome from './nx-welcome';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from './auth/auth-context';
+import { RequireAuth } from './auth/require-auth';
+import { AppHeader } from './components/app-header';
+import { LoginPage } from './pages/login-page';
+import { RegisterPage } from './pages/register-page';
+import { DashboardPage } from './pages/dashboard-page';
+import { CreateApplicationPage } from './pages/create-application-page';
+import { ApplicationDetailPage } from './pages/application-detail-page';
+import { AdminPage } from './pages/admin-page';
+import type { ReactElement } from 'react';
 
-import { Route, Routes, Link } from 'react-router-dom';
-
-export function App() {
+export function App(): ReactElement {
   return (
-    <div>
-      <NxWelcome title="@org/web" />
-
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </nav>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
+    <div className="app-shell">
+      <AppHeader />
+      <main className="main">
+        <Routes>
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/apply"
+            element={
+              <RequireAuth>
+                <CreateApplicationPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/applications/:id"
+            element={
+              <RequireAuth>
+                <ApplicationDetailPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth roles={['ADMIN']}>
+                <AdminPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
 
-export default App;
+function RootRedirect(): ReactElement {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const from = location.state
+    ? (location.state as { from?: { pathname?: string } }).from?.pathname
+    : undefined;
+  return (
+    <Navigate
+      to={isAuthenticated ? '/dashboard' : '/login'}
+      replace
+      state={from ? { from } : undefined}
+    />
+  );
+}
